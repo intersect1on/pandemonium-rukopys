@@ -1,0 +1,51 @@
+% !TeX program = xelatex
+\documentclass[english]{ucuproposal}
+\projecttitle{Ukrainian Handwritten Text Recognition on RUKOPYS}
+\projecttagline{Page-to-text recognition with source-aware evaluation and filtered self-training}
+
+\teammember[https://github.com/intersect1on]{Oleh Hutsuliak}
+\teammember[https://github.com/Stalex575]{Oleksandr Stadnik}
+
+\mentor{Yaroslav Prytula}
+\track{research}
+\repo{https://github.com/intersect1on/pandemonium-rukopys}
+\proposaldate{2026-09-20}
+
+\begin{document}
+\maketitlepage
+
+\section{Problem and motivation}
+We propose an end-to-end inference pipeline that takes an image of a Ukrainian handwritten page and returns detected regions, their types, and transcribed Ukrainian text. Variation in handwriting, historical spelling, and image quality makes this a joint computer vision and sequence modelling problem. The system could support searchable archives and document digitisation. Our research question is whether confidence-filtered self-training improves recognition across document sources compared with human-labelled training alone, and whether average gains conceal degradation on individual sources.
+
+\section{Related work and existing solutions}
+TrOCR~\cite{li2021} combines pretrained image and text Transformers for recognition; DETR~\cite{carion2020} jointly predicts boxes and classes. Together they offer a modular starting point that can be trained and debugged on separate tasks. RUKOPYS~\cite{rukopys2026} enables Ukrainian-specific adaptation. The Handwritten to Data challenge~\cite{kaggle2026} evaluates layout and transcription jointly; its third-place final solution used Rukopys-OCR-4B, a fine-tuned vision-language model~\cite{ebi2026}. This motivates investigating pseudo-label quality and document-level errors, while our contribution remains an independently implemented, compute-conscious comparison of supervised and silver-assisted training.
+
+\section{Data}
+RUKOPYS has been downloaded; integrity and annotation checks remain planned. Its card~\cite{rukopys2026} reports 1,330 human-annotated training pages (25,651 regions), 9,020 silver pages (190,382 regions), and 385 public test pages (8,290 regions), spanning dictations, archives, university exams, and school notebooks. Labels include boxes, types, text, language, and legibility. The card declares CC BY 4.0 and prior personal-information review. We will retain attribution, document terms in \texttt{data/README.md}, and review examples before redistribution. No scraping is planned.
+
+We will record the downloaded revision and reserve approximately 10\% of training pages for validation, stratified by source. All crops from a page, identifiable document groups, and duplicates will stay together. The 385 official test pages will remain excluded from model selection and pseudo-labelling. Once settings and training duration are fixed on validation, final comparison models can be retrained on all 1,330 training pages before a single final evaluation.
+
+\section{Approach and methods}
+The pipeline is \textbf{page image $\rightarrow$ region boxes and types $\rightarrow$ cropped handwritten lines $\rightarrow$ text in reading order}. A pretrained DETR detector will be fine-tuned for seven region classes, and a pretrained TrOCR recogniser will be adapted to Ukrainian line images using PyTorch and Hugging Face. A short pilot will check Ukrainian tokenisation, long-line truncation, memory use, and ability to learn a small training subset before committing to a checkpoint. Formula and table transcription remain extensions; unsupported content will be identified explicitly.
+
+We will compare three versions: \textbf{A, supervised baseline}, trained on human labels; \textbf{B, silver-data control}, adding existing automatic labels from a fixed source-balanced pool; and \textbf{C, refined recogniser}, using confidence- and consistency-filtered teacher predictions from that same pool, with reduced pseudo-label weight and one self-training round. The teacher will use training data only; thresholds will be chosen on validation. Architecture, preprocessing, and optimisation budget will match, and accepted sample counts will be reported. A fixed detector will isolate recognition gains. Separately, crop padding and skew/blur augmentation will be tested one at a time. Text processing will preserve Ukrainian letters and historical spelling, with explicit rules for illegible text and annotation markers.
+
+\section{Evaluation}
+Recognition will use corpus-level character and word error rates (CER/WER) on ground-truth handwritten crops. Detection will use mAP at IoU 0.50--0.95; type classification will use macro-F1 on one-to-one matches at IoU $\geq0.5$, with matched-region coverage. Pipeline evaluation will include handwritten page CER in a fixed reading order, counting missing and spurious text, plus aggregate and per-source results, runtime, and page-bootstrap confidence intervals. The target is lower CER than A without substantial degradation on any source; improvement is a hypothesis, not a guarantee.
+
+The official Kaggle score weights detection F1, classification accuracy, region CER, and page CER by 15/5/30/50\%~\cite{kaggle2026}. Numerical comparison requires its scorer, normalisation, matching, and compatible test version; handwritten-only scores will be labelled separately, and omitted content penalised in any full-task score. Model selection will precede test evaluation. Deliverables are a page-to-text demo, weights and a model card on Hugging Face, reproducible evaluation, and a technical report, including negative findings.
+
+\section{Plan and risks}
+\textbf{By 26 October (midterm):} audit data, train detector and recogniser using ground-truth crops, and demonstrate A with metrics. \textbf{November:} compare A/B/C and CV refinements, then integrate and analyse source-level errors. \textbf{By 10 December:} freeze experiments, prepare the poster, report, and weights.
+
+Resources are an Apple M3 Pro, an NVIDIA RTX 5060M GPU, and free Colab. If insufficient, we will request ML-lab access to three RTX 2080 Ti GPUs or consider paid rental such as Vast.ai. Single-GPU runs, small batches, cached crops, encoder freezing, and supported mixed precision are the default; a timing pilot will validate the provisional 40--60 GPU-hour estimate. If constrained, reduce the silver pool and trainable layers. If pseudo-labels degrade quality, retain A. Poor Cyrillic adaptation triggers an early checkpoint review; rare classes, skew, and long lines require error analysis. So outputs need human review before use.
+
+\section{Contribution statement}
+\begin{contributions}
+  \contribution[50\%]{Oleh Hutsuliak}{image audit, detection/types, crops, augmentation, and CV metrics.}
+  \contribution[50\%]{Oleksandr Stadnik}{text audit, recognition/decoding, pseudo-label filtering, and CER/WER.}
+\end{contributions}
+We will both share splits, integration, experiments, analysis, writing, and presentations equally throughout the semester.
+
+\ucuprintbibliography
+\end{document}
