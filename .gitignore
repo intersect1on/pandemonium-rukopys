@@ -1,0 +1,62 @@
+# Local secrets and machine settings
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.DS_Store
+.idea/
+.vscode/
+
+# Python environments and caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+*.egg-info/
+build/
+dist/
+
+# Dataset contents stay outside Git; allow documentation and split IDs only
+/data/*
+!/data/README.md
+!/data/splits/
+/data/splits/*
+!/data/splits/README.md
+!/data/splits/*.json
+!/data/splits/*.csv
+
+# Model weights, local downloads, and training output
+/models/*
+!/models/README.md
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.onnx
+*.bin
+.cache/
+/checkpoints/
+/outputs/
+/runs/
+/wandb/
+/lightning_logs/
+
+# Temporary LaTeX outputs; keep the deliberately named final proposal PDF
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.xdv
+/docs/proposal/main.pdf
+*.zip
