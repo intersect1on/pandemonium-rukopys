@@ -23,6 +23,12 @@ dist/
 # Dataset contents stay outside Git; allow documentation and split IDs only
 /data/*
 !/data/README.md
+!/data/eda.md
+!/data/images/
+/data/images/*
+!/data/images/examples.png
+!/data/images/sources.png
+!/data/images/regions.png
 !/data/splits/
 /data/splits/*
 !/data/splits/README.md

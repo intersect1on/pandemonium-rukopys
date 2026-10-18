@@ -4,7 +4,7 @@ Ukrainian handwritten text recognition on [RUKOPYS](https://huggingface.co/datas
 
 ## Status
 
-Proposal stage. The dataset is downloaded; its local audit, model implementation, and experiments are pending. No trained model or measured results are available yet.
+Data preparation stage. The downloaded snapshot has been inventoried and audited; see [data/eda.md](data/eda.md) for findings. Validation splitting and model training are next. No trained model or model-performance results are available yet.
 
 ## Problem and approach
 
@@ -24,7 +24,7 @@ Planned metrics: CER/WER, detection mAP, type macro-F1 with coverage, handwritte
 
 ## Setup and results
 
-No training or evaluation commands exist yet.
+The data audit can be reproduced with `python scripts/eda.py PATH_TO_SNAPSHOT` after installing `requirements.txt`. See [data/README.md](data/README.md) for setup, download instructions, and the pinned revision. Training and model-evaluation commands are not implemented yet.
 
 ## Contribution statement
 
@@ -35,4 +35,4 @@ No training or evaluation commands exist yet.
 
 ## AI usage
 
-Codex assisted with writing. We guided it and reviewed all the work.
+Codex assisted with writing and the EDA script. We guided and reviewed the earlier work, and ran the audit on the local snapshot.
