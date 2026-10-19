@@ -4,20 +4,24 @@ Ukrainian document-recognition data from [UCU](https://huggingface.co/datasets/U
 
 Each split contains `images/` and `metadata.jsonl`, one record per page. Regions have pixel boxes `[x1, y1, x2, y2]`, type, transcript, language, and legibility. Types: handwritten, printed, formula (LaTeX), table (pipe-separated values), annotation, image, and graph (last two expect empty text). See [EDA](eda.md) for counts, examples, and issues.
 
-## Download and run
+## Setup, download, and run
 
-Use an existing snapshot, or download the pinned version with:
+Requires [uv](https://docs.astral.sh/uv/). From the repository root, install the locked project environment:
 
 ```sh
-python -m pip install huggingface_hub
-hf download UkrainianCatholicUniversity/rukopys --repo-type dataset --revision 78697007cfa5f77aae5d3b9fcedfac3169f84fb6
+uv sync
 ```
 
-In an activated Python 3.11+ environment, run from the repository root:
+Use an existing snapshot, or download the pinned version with the `hf` CLI from the project environment:
 
 ```sh
-python -m pip install -r requirements.txt
-python scripts/eda.py PATH_TO_SNAPSHOT
+uv run hf download UkrainianCatholicUniversity/rukopys --repo-type dataset --revision 78697007cfa5f77aae5d3b9fcedfac3169f84fb6
+```
+
+Run the audit from the repository root:
+
+```sh
+uv run python scripts/eda.py PATH_TO_SNAPSHOT
 ```
 
 The script writes `data/eda.md` and three figures in `data/images/`. It checks metadata, image headers, and exact duplicates; it does not fully decode every image. Raw data stay outside Git.

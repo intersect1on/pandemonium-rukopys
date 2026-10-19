@@ -24,7 +24,7 @@ Planned metrics: CER/WER, detection mAP, type macro-F1 with coverage, handwritte
 
 ## Setup and results
 
-The data audit can be reproduced with `python scripts/eda.py PATH_TO_SNAPSHOT` after installing `requirements.txt`. See [data/README.md](data/README.md) for setup, download instructions, and the pinned revision. Training and model-evaluation commands are not implemented yet.
+The data audit can be reproduced with `uv run python scripts/eda.py PATH_TO_SNAPSHOT` after running `uv sync`. See [data/README.md](data/README.md) for setup, download instructions, and the pinned revision. Training and model-evaluation commands are not implemented yet.
 
 ## Contribution statement
 
