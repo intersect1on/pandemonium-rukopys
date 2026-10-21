@@ -4,7 +4,7 @@ Ukrainian handwritten text recognition on [RUKOPYS](https://huggingface.co/datas
 
 ## Status
 
-Data preparation stage. The downloaded snapshot has been inventoried and audited; see [data/eda.md](data/eda.md) for findings. Validation splitting and model training are next. No trained model or model-performance results are available yet.
+Midterm stage. The downloaded snapshot has been inventoried and audited; see [data/eda.md](data/eda.md) for findings. Recognition has a pilot and a supervised baseline (A: TrOCR fine-tuned on ground-truth handwritten line crops) evaluated on a provisional validation split; see `notebooks/`. Detection and type classification are not in the repository yet.
 
 ## Problem and approach
 
@@ -24,7 +24,17 @@ Planned metrics: CER/WER, detection mAP, type macro-F1 with coverage, handwritte
 
 ## Setup and results
 
-The data audit can be reproduced with `uv run python scripts/eda.py PATH_TO_SNAPSHOT` after running `uv sync`. See [data/README.md](data/README.md) for setup, download instructions, and the pinned revision. Training and model-evaluation commands are not implemented yet.
+The data audit can be reproduced with `uv run python scripts/eda.py PATH_TO_SNAPSHOT` after running `uv sync`. See [data/README.md](data/README.md) for setup, download instructions, and the pinned revision.
+
+The recognition notebooks need the pinned snapshot in the Hugging Face cache and an NVIDIA GPU with about 7 GB free. Run them in order from the repository root:
+
+```sh
+uv run --with nbconvert jupyter nbconvert --to notebook --execute --inplace notebooks/01_htr_pilot.ipynb
+uv run --with nbconvert jupyter nbconvert --to notebook --execute --inplace notebooks/02_htr_baseline_train.ipynb
+uv run --with nbconvert jupyter nbconvert --to notebook --execute --inplace notebooks/03_htr_eval.ipynb
+```
+
+`01_htr_pilot` writes the split ([data/splits/](data/splits/README.md)) and line crops (`data/htr_crops/`, not in Git), and compares checkpoints, tokenisation, and decoding. `02_htr_baseline_train` trains baseline A (about 1.5 hours on an RTX 5060 Laptop GPU) and saves weights to `models/trocr-uk-baseline/` (not in Git). `03_htr_eval` writes validation predictions and metrics to `results/htr/`. Shared helpers are in `src/htr.py`.
 
 ## Contribution statement
 
@@ -36,3 +46,5 @@ The data audit can be reproduced with `uv run python scripts/eda.py PATH_TO_SNAP
 ## AI usage
 
 Codex assisted with writing and the EDA script. We guided and reviewed the earlier work, and ran the audit on the local snapshot.
+
+Claude assisted with the recognition helpers and notebooks. We guided and reviewed the work and checked its results against the data.
