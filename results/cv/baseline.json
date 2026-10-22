@@ -1,0 +1,241 @@
+{
+  "training": {
+    "dataset_revision": "78697007cfa5f77aae5d3b9fcedfac3169f84fb6",
+    "split_sha256": "51c79caa343c7c20f00345f8b9dd65a772fae615958ed0633353e900e3dfb476",
+    "device": "mps:0",
+    "torch_version": "2.14.1",
+    "base_model": "facebook/detr-resnet-50",
+    "base_revision": "70120ba84d68ca1211e007c4fb61d0cd5424be54",
+    "config": {
+      "epochs": 10,
+      "batch_size": 1,
+      "accumulation": 4,
+      "lr": 0.0001,
+      "shortest_edge": 640,
+      "longest_edge": 960,
+      "seed": 42,
+      "freeze_backbone": true
+    },
+    "history": [
+      {
+        "epoch": 1,
+        "minutes": 3.8998087843259177,
+        "train_loss": 3.972930072642608,
+        "mAP": 0.008357356260074797,
+        "AP50": 0.027006362903449366
+      },
+      {
+        "epoch": 2,
+        "minutes": 3.934730597337087,
+        "train_loss": 2.540497584848874,
+        "mAP": 0.009562622889347165,
+        "AP50": 0.02900201403193054
+      },
+      {
+        "epoch": 3,
+        "minutes": 3.89226158062617,
+        "train_loss": 2.338271859694045,
+        "mAP": 0.014180248825507268,
+        "AP50": 0.045638771156272774
+      },
+      {
+        "epoch": 4,
+        "minutes": 3.8667125980059307,
+        "train_loss": 2.178790636180138,
+        "mAP": 0.01660401864138003,
+        "AP50": 0.05287952615293344
+      },
+      {
+        "epoch": 5,
+        "minutes": 3.862050453821818,
+        "train_loss": 2.0961179584887195,
+        "mAP": 0.01889517681653766,
+        "AP50": 0.05477022799362923
+      },
+      {
+        "epoch": 6,
+        "minutes": 3.865354533990224,
+        "train_loss": 2.0223818282435713,
+        "mAP": 0.021682282110830082,
+        "AP50": 0.06488322568316304
+      },
+      {
+        "epoch": 7,
+        "minutes": 3.8745171507199605,
+        "train_loss": 1.9732546852644823,
+        "mAP": 0.020970577194184537,
+        "AP50": 0.0659066851773959
+      },
+      {
+        "epoch": 8,
+        "minutes": 3.878848131497701,
+        "train_loss": 1.9048745785540306,
+        "mAP": 0.021306817179715234,
+        "AP50": 0.06408040708589481
+      },
+      {
+        "epoch": 9,
+        "minutes": 3.9192386786142985,
+        "train_loss": 1.8708566587570814,
+        "mAP": 0.025695541093003527,
+        "AP50": 0.07361609386171639
+      },
+      {
+        "epoch": 10,
+        "minutes": 3.87558091878891,
+        "train_loss": 1.826259764115215,
+        "mAP": 0.02494688963770635,
+        "AP50": 0.07080157334106303
+      }
+    ]
+  },
+  "metrics": {
+    "raw": {
+      "pages": 133,
+      "mAP": 0.025695541093003527,
+      "AP50": 0.07361609386171639,
+      "AP_by_type": {
+        "handwritten": 0.11903436111473732,
+        "printed": 0.0,
+        "formula": 0.039041895561023866,
+        "table": 0.0,
+        "annotation": 0.021792530975263534,
+        "image": 0.0,
+        "graph": 0.0
+      },
+      "score_threshold": 0.25,
+      "detection_precision": 0.20029272686331906,
+      "detection_recall": 0.7222898903775883,
+      "detection_F1": 0.3136183340678713,
+      "matched_regions": 1779,
+      "gt_regions": 2463,
+      "matched_coverage": 0.7222898903775883,
+      "type_accuracy": 0.9246767847105115,
+      "type_macro_F1": 0.3378930182394333
+    },
+    "filtered": {
+      "pages": 133,
+      "mAP": 0.02837733023736317,
+      "AP50": 0.08814920087484082,
+      "AP_by_type": {
+        "handwritten": 0.12877855702676141,
+        "printed": 0.0,
+        "formula": 0.0428448270302124,
+        "table": 0.0,
+        "annotation": 0.027017927604568406,
+        "image": 0.0,
+        "graph": 0.0
+      },
+      "score_threshold": 0.7,
+      "detection_precision": 0.5480410447761194,
+      "detection_recall": 0.4770604953308973,
+      "detection_F1": 0.5100933362274799,
+      "matched_regions": 1175,
+      "gt_regions": 2463,
+      "matched_coverage": 0.4770604953308973,
+      "type_accuracy": 0.9880851063829788,
+      "type_macro_F1": 0.23939243757110193
+    },
+    "epoch": 9,
+    "checkpoint": "models/detr-baseline/best",
+    "postprocessing": {
+      "nms_iou": 0.5,
+      "score_threshold": 0.7,
+      "selection": "validation geometry F1"
+    },
+    "per_source": {
+      "dictation": {
+        "pages": 36,
+        "mAP": 0.09518161070589023,
+        "AP50": 0.3626039511345185,
+        "AP_by_type": {
+          "handwritten": 0.1375957514953228,
+          "printed": null,
+          "formula": null,
+          "table": null,
+          "annotation": 0.14794908062234793,
+          "image": 0.0,
+          "graph": null
+        },
+        "score_threshold": 0.7,
+        "detection_precision": 0.5619747899159664,
+        "detection_recall": 0.6613102595797281,
+        "detection_F1": 0.6076093128904033,
+        "matched_regions": 535,
+        "gt_regions": 809,
+        "matched_coverage": 0.6613102595797281,
+        "type_accuracy": 1.0,
+        "type_macro_F1": 0.14285714285714285
+      },
+      "archive": {
+        "pages": 13,
+        "mAP": 0.14410364218272725,
+        "AP50": 0.35921584413691326,
+        "AP_by_type": {
+          "handwritten": 0.186722135850603,
+          "printed": null,
+          "formula": null,
+          "table": null,
+          "annotation": 0.10148514851485149,
+          "image": null,
+          "graph": null
+        },
+        "score_threshold": 0.7,
+        "detection_precision": 0.5962059620596206,
+        "detection_recall": 0.6832298136645962,
+        "detection_F1": 0.6367583212735167,
+        "matched_regions": 220,
+        "gt_regions": 322,
+        "matched_coverage": 0.6832298136645962,
+        "type_accuracy": 1.0,
+        "type_macro_F1": 0.14285714285714285
+      },
+      "university": {
+        "pages": 16,
+        "mAP": 0.021837058085899565,
+        "AP50": 0.08101444910688894,
+        "AP_by_type": {
+          "handwritten": 0.07869456413664966,
+          "printed": null,
+          "formula": 0.018381306610224326,
+          "table": null,
+          "annotation": 0.012109419682623813,
+          "image": 0.0,
+          "graph": 0.0
+        },
+        "score_threshold": 0.7,
+        "detection_precision": 0.4669260700389105,
+        "detection_recall": 0.28846153846153844,
+        "detection_F1": 0.35661218424962854,
+        "matched_regions": 120,
+        "gt_regions": 416,
+        "matched_coverage": 0.28846153846153844,
+        "type_accuracy": 0.9333333333333333,
+        "type_macro_F1": 0.13793103448275862
+      },
+      "school": {
+        "pages": 68,
+        "mAP": 0.02506149274639161,
+        "AP50": 0.07439183122428071,
+        "AP_by_type": {
+          "handwritten": 0.12203048419047995,
+          "printed": 0.0,
+          "formula": 0.053399965034261344,
+          "table": 0.0,
+          "annotation": 0.0,
+          "image": 0.0,
+          "graph": 0.0
+        },
+        "score_threshold": 0.7,
+        "detection_precision": 0.5300353356890459,
+        "detection_recall": 0.32751091703056767,
+        "detection_F1": 0.4048582995951417,
+        "matched_regions": 300,
+        "gt_regions": 916,
+        "matched_coverage": 0.32751091703056767,
+        "type_accuracy": 0.98,
+        "type_macro_F1": 0.26038500506585616
+      }
+    }
+  }
+}

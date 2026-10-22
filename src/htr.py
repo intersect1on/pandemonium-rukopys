@@ -20,6 +20,9 @@ Image.MAX_IMAGE_PIXELS = None
 
 
 def snapshot():
+    local = ROOT / 'data/rukopys/snapshots' / REVISION
+    if local.is_dir():
+        return local
     return Path(snapshot_download('UkrainianCatholicUniversity/rukopys', repo_type='dataset',
                                   revision=REVISION, local_files_only=True))
 

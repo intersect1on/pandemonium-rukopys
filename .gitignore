@@ -66,3 +66,7 @@ dist/
 *.xdv
 /docs/proposal/main.pdf
 *.zip
+
+/results/cv/**/val_predictions.json
+
+/tests/

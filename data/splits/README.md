@@ -7,4 +7,4 @@
 - Train dictation pages all copy the same 2024 dictation text, so validation dictation is partly memorisable. Report results per source.
 - The official `test` split is not part of this file and is not used for model or threshold selection.
 
-The file is written by `notebooks/01_htr_pilot.ipynb`. It is provisional until both modules agree on it. If it changes, rerun both HTR notebooks.
+The file is written by `notebooks/01_htr_pilot.ipynb`. The CV baseline reuses this exact file; `results/cv/baseline.json` records its SHA-256. It remains provisional with the grouping limitations above.
