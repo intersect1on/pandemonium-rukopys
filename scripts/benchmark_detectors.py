@@ -9,18 +9,24 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'src'))
 MODELS = ['rf-nano', 'rf-small', 'rtv2-r18', 'dfine-small', 'deimv2-nano', 'yolo26s']
 parser = argparse.ArgumentParser()
-parser.add_argument('--models', nargs='+', choices=MODELS, default=MODELS)
-parser.add_argument('--minutes', type=float, default=50)
+parser.add_argument('--models', nargs='+', choices=MODELS)
+parser.add_argument('--minutes', type=float)
 parser.add_argument('--device', default='gpu', choices=['gpu', 'mps', 'cuda', 'cpu'])
 parser.add_argument('--resume-existing', action='store_true')
 parser.add_argument('--evaluate-only', action='store_true')
 parser.add_argument('--report', action='store_true')
+parser.add_argument('--refine', action='store_true')
 args = parser.parse_args()
+if args.refine and args.models not in (None, ['rf-small']):
+    parser.error('refine is only available for rf-small')
+args.models = args.models or (['rf-small'] if args.refine else MODELS)
+if args.minutes is None:
+    args.minutes = 540 if args.refine else 50
 if args.minutes <= 0:
     parser.error('minutes must be positive')
 if args.report:
-    from detectors import write_comparison_report
-    print(write_comparison_report().round(4).to_string(index=False))
+    from detectors import refinement_table, write_comparison_report
+    print((refinement_table() if args.refine else write_comparison_report()).round(4).to_string(index=False))
 elif len(args.models) > 1:
     failures = []
     for name in args.models:
@@ -34,10 +40,11 @@ elif len(args.models) > 1:
 else:
     from detectors import evaluate_variant, train_budget, train_yolo
     name = args.models[0]
-    directory = ROOT / 'models' / f'benchmark-{name}'
+    directory = ROOT / 'models' / ('rf-small-refined' if args.refine else f'benchmark-{name}')
     state = directory / ('weights/training_state.pt' if name == 'yolo26s' else 'last/state.pt')
     config = dict(model=name, minutes=args.minutes, device=args.device, size=640, seed=42,
-                  train_pages=None, val_pages=None, pilot=False, resume=args.resume_existing and state.exists())
+                  train_pages=None, val_pages=None, pilot=False, refine=args.refine,
+                  resume=args.resume_existing and state.exists())
     print(f'{name}: {"resume" if config["resume"] else "pretrained weights"}; {args.minutes:g} cumulative minutes', flush=True)
     if args.evaluate_only:
         evaluate_variant(config)

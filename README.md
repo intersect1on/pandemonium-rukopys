@@ -4,7 +4,7 @@ Ukrainian handwritten text recognition on [RUKOPYS](https://huggingface.co/datas
 
 ## Status
 
-Midterm stage. The downloaded snapshot has been audited; see [data/eda.md](data/eda.md). Recognition has a supervised TrOCR baseline on ground-truth line crops. The 10-epoch detector baseline is trained; validation exposed duplicate boxes and weak localization. A separate fine-tuning experiment adds backbone adaptation, larger images, and auxiliary losses. Modern detector variants are now being compared under equal time budgets.
+Midterm stage. The downloaded snapshot has been audited; see [data/eda.md](data/eda.md). Recognition has a supervised TrOCR baseline on ground-truth line crops. The 10-epoch detector baseline is trained; validation exposed duplicate boxes and weak localization. Six modern detector benchmarks are complete. RF-DETR Small refinement reached validation mAP 0.5105; early stopping retained epoch 12 after 17 epochs.
 
 ## Problem and approach
 
@@ -12,9 +12,9 @@ Turn a page image into content regions, region types, and Ukrainian handwritten 
 
 `page -> DETR detector/type classifier -> handwritten line crops -> TrOCR -> ordered text`
 
-Compare a human-label-only baseline (A), existing silver-label training (B), and filtered self-training (C), keeping the detector fixed for recognition comparisons. Test CV improvements separately. Formula/table transcription is an extension.
+Recognition baseline A uses human-annotated handwritten line crops. Planned experiments add existing silver labels (B) and filtered pseudo-labels (C), using the same detector across recognition comparisons. Detection covers all seven region types; the current recognizer transcribes handwritten text.
 
-Use about 10% of official training pages for grouped validation. Preserve the entire official test set for final evaluation; after settings are fixed, final comparison models may be refitted on all human training pages.
+The shared split contains 1,197 training pages and 133 validation pages, stratified by source with seed 42. The official test set is reserved for final evaluation.
 
 ## Data and evaluation
 
@@ -36,16 +36,18 @@ uv run --with nbconvert jupyter nbconvert --to notebook --execute --inplace note
 
 `01_htr_pilot` writes the split ([data/splits/](data/splits/README.md)) and line crops (`data/htr_crops/`, not in Git), and compares checkpoints, tokenisation, and decoding. `02_htr_baseline_train` trains baseline A (about 1.5 hours on an RTX 5060 Laptop GPU) and saves weights to `models/trocr-uk-baseline/` (not in Git). `03_htr_eval` writes validation predictions and metrics to `results/htr/`. Shared helpers are in `src/htr.py`. They also find the relocated local snapshot under `data/rukopys/`.
 
-The CV benchmark compares six pretrained detectors for 50 minutes each on the M3 Pro. **RF-DETR Small leads mAP (0.4251)** and is selected for longer refinement; **YOLO26 Small leads handwritten crop coverage (90.1%)** and remains an HTR comparison. See the [comparison table and next-step rationale](results/cv/benchmark/comparison.md).
+The CV benchmark compares six pretrained detectors for 50 minutes each on the M3 Pro. **RF-DETR Small leads mAP (0.4251)** and is selected for longer refinement; **YOLO26 Small leads handwritten crop coverage (90.1%)** and remains an HTR comparison. The [50-minute comparison](results/cv/benchmark/comparison.md) records model selection. Further RF-DETR Small refinement reached mAP **0.5105** and handwritten line coverage **89.7%**; the [refinement report](results/cv/rf-small-refined.md) includes metrics and failure examples.
 
 ```sh
 uv run python -u scripts/benchmark_detectors.py --minutes 50 --resume-existing
 uv run python scripts/benchmark_detectors.py --report
 ```
 
-`--device gpu` selects CUDA → MPS → CPU. The budget is cumulative per candidate; loading and final evaluation are extra. `--resume-existing` preserves saved progress. For one candidate, add `--models rf-small`; for inference only, add `--evaluate-only`. Settings and scores are in `results/cv/benchmark/runs.json`. Earlier pilots are archived locally. Reproducing the original DETR reference uses `uv run python -u scripts/train_detector.py --device gpu`.
+CV notebooks cover [model selection](notebooks/04_detector_comparison.ipynb), [data checks](notebooks/05_cv_data.ipynb), [refinement](notebooks/06_rf_small_refine.ipynb) and [evaluation](notebooks/07_cv_eval.ipynb).
 
-Weights, data and predicted crops stay outside Git. Best Transformer weights are in `models/benchmark-<model>/best/`; YOLO uses `weights/common_best.pt`. HTR-compatible crops are in `data/detector_crops/<model>/`. Evaluate the same recognizer on RF-DETR Small and YOLO crops, reporting CER/WER together with coverage and unmatched predictions. Official test remains reserved.
+The benchmark budget is cumulative per candidate. `--resume-existing` resumes saved progress, `--models rf-small` selects one candidate, and `--evaluate-only` evaluates saved checkpoints. Run settings and scores are recorded in `results/cv/benchmark/runs.json`.
+
+Weights, data and predicted crops stay outside Git.
 
 ## Contribution statement
 

@@ -36,9 +36,9 @@ def compact_training(training):
     result = {key: training[key] for key in keys if key in training}
     result['config'] = {key: value for key, value in training['config'].items() if key in
         ('model', 'minutes', 'size', 'seed', 'epochs', 'batch_size', 'accumulation', 'lr', 'lr_backbone',
-         'shortest_edge', 'longest_edge', 'freeze_backbone')}
+         'shortest_edge', 'longest_edge', 'freeze_backbone', 'refine', 'lr_scale', 'patience', 'min_delta', 'init_from')}
     result['history'] = [{key: row[key] for key in ('epoch', 'pages_in_epoch', 'images_seen', 'seconds',
-        'minutes', 'train_loss', 'mAP', 'AP50') if key in row} for row in training['history']]
+        'minutes', 'train_loss', 'mAP', 'AP50', 'epoch_complete') if key in row} for row in training['history']]
     if 'native_args' in training:
         native = training['native_args']
         result['optimizer'] = {key: native[key] for key in
@@ -55,7 +55,7 @@ def compact_metrics(report):
 
 
 def save_run(name, training=None, metrics=None):
-    path = BENCH_DIR / 'runs.json'
+    path = ROOT / 'results/cv/rf-small-refined.json' if name == 'rf-small-refined' else BENCH_DIR / 'runs.json'
     runs = json.loads(path.read_text()) if path.exists() else {}
     record = runs.setdefault(name, {})
     if training is not None:
@@ -89,6 +89,18 @@ class BudgetSchedule:
     def load_state_dict(self, state):
         self.warmup_seconds = state['warmup_seconds']
         self.elapsed_seconds = state['elapsed_seconds']
+
+
+def early_stopping(history, patience=5, min_delta=.002):
+    reference, waiting = history[0]['mAP'], 0
+    for row in history[1:]:
+        if not row['epoch_complete']:
+            continue
+        if row['mAP'] >= reference + min_delta:
+            reference, waiting = row['mAP'], 0
+        else:
+            waiting += 1
+    return waiting, waiting >= patience
 
 
 class MPSIntegral(torch.nn.Module):
@@ -163,26 +175,43 @@ def summarize(name, model, processor, pages, directory, predictions=None):
 
 def train_budget(config):
     name = config['model']
-    directory = ROOT / 'models' / f'benchmark-{name}'
+    refine = config.get('refine', False)
+    if refine:
+        if name != 'rf-small':
+            raise ValueError('Refinement is only available for RF-DETR Small.')
+        config = config | dict(lr_scale=.3, patience=5, min_delta=.002, init_from='models/benchmark-rf-small/best')
+    run_name = 'rf-small-refined' if refine else name
+    directory = ROOT / 'models' / ('rf-small-refined' if refine else f'benchmark-{name}')
     resume = config.get('resume', False)
     if (directory / 'last/state.pt').exists() and not resume:
         raise ValueError(f'{directory} already has a run. Use --resume-existing.')
     torch.manual_seed(config['seed'])
     np.random.seed(config['seed'])
     random.seed(config['seed'])
-    processor, model = load_variant(name, directory / 'last' if resume else None, config['size'], config['device'])
+    initial = ROOT / config['init_from'] if refine else None
+    processor, model = load_variant(name, directory / 'last' if resume else initial, config['size'], config['device'])
     groups = optimizer_groups(name, model)
+    for group in groups:
+        group['lr'] *= config.get('lr_scale', 1.)
+        group['base_lr'] = group['lr']
     optimizer = torch.optim.AdamW(groups, weight_decay=1e-4)
     scheduler = BudgetSchedule(optimizer, config['minutes'] * 60)
     pages = pages_with_split()
     train, val = subset(pages, 'train'), subset(pages, 'val')
     split_hash = hashlib.sha256(SPLIT_FILE.read_bytes()).hexdigest()
+    if refine:
+        source = json.loads((BENCH_DIR / 'runs.json').read_text())['rf-small']['training']
+        if source['split_sha256'] != split_hash or source['dataset_revision'] != REVISION:
+            raise ValueError('Refinement must use the benchmark dataset and page split.')
     epoch, offset, spent, images_seen, best, history = 1, 0, 0., 0, -1., []
     if resume:
         state = torch.load(directory / 'last/state.pt', map_location='cpu', weights_only=False)
         for key in ('model', 'size', 'seed', 'train_pages', 'val_pages'):
             if config.get(key) != state['config'].get(key):
                 raise ValueError(f'Resume setting changed: {key}')
+        if refine and any(config[key] != state['config'].get(key) for key in
+                          ('refine', 'minutes', 'lr_scale', 'patience', 'min_delta', 'init_from')):
+            raise ValueError('Refinement resume settings must match its saved configuration.')
         if state['split_sha256'] != split_hash:
             raise ValueError('The shared split changed.')
         optimizer.load_state_dict(state['optimizer'])
@@ -203,8 +232,49 @@ def train_budget(config):
     print(f'{sum(p.numel() for p in model.parameters())/1e6:.1f}M parameters; input {config["size"]} square; batch 1, accumulation 4', flush=True)
     optimizer.zero_grad(set_to_none=True)
     losses = []
+
+    def checkpoint(metrics):
+        nonlocal best
+        improved = metrics['mAP'] > best
+        best = max(best, metrics['mAP'])
+        model.save_pretrained(directory / 'last')
+        processor.save_pretrained(directory / 'last')
+        if improved:
+            model.save_pretrained(directory / 'best')
+            processor.save_pretrained(directory / 'best')
+        next_epoch, next_offset = (epoch + 1, 0) if offset == len(train) else (epoch, offset)
+        state = dict(config=config, epoch=next_epoch, offset=next_offset, seconds=elapsed(), images_seen=images_seen,
+            best=best, history=history, optimizer=optimizer.state_dict(), rng=torch.get_rng_state(),
+            scheduler=scheduler.state_dict(), numpy_rng=np.random.get_state(), python_rng=random.getstate(),
+            device_rng=torch.mps.get_rng_state() if next(model.parameters()).device.type == 'mps' else None,
+            split_sha256=split_hash)
+        temporary = directory / 'last/state.tmp.pt'
+        torch.save(state, temporary)
+        temporary.replace(directory / 'last/state.pt')
+        stopped = refine and early_stopping(history, config['patience'], config['min_delta'])[1]
+        metadata = dict(config=config, checkpoint=dict(zip(('id', 'revision'), VARIANTS[name])),
+            dataset_revision=REVISION, split_sha256=split_hash, device=str(next(model.parameters()).device),
+            torch_version=torch.__version__, parameters=sum(p.numel() for p in model.parameters()), history=history,
+            charged_seconds=state['seconds'], status='early_stopped' if stopped else 'complete' if elapsed() >= budget else 'paused',
+            optimizer=dict(name='AdamW', weight_decay=1e-4,
+                base_learning_rates=[group['base_lr'] for group in optimizer.param_groups],
+                schedule='cosine over elapsed budget, linear warmup up to 150 seconds', effective_batch=4))
+        (directory / 'training.json').write_text(json.dumps(metadata, indent=2))
+        save_run(run_name, training=metadata)
+        print(f'{run_name}: validation mAP {metrics["mAP"]:.4f}, AP50 {metrics["AP50"]:.4f}; best {best:.4f}; saved at {elapsed()/60:.1f} min', flush=True)
+        if refine:
+            waiting = early_stopping(history, config['patience'], config['min_delta'])[0]
+            print(f'Early stopping: {waiting}/{config["patience"]} epochs without a cumulative mAP gain of {config["min_delta"]}', flush=True)
+        return stopped
+
     try:
-        while elapsed() < budget:
+        if refine and not resume:
+            metrics = detection_metrics(val, predict_pages(model, processor, val))
+            history.append(dict(epoch=0, pages_in_epoch=0, images_seen=0, seconds=elapsed(),
+                                train_loss=None, epoch_complete=False, **metrics))
+            checkpoint(metrics)
+        stopped = refine and early_stopping(history, config['patience'], config['min_delta'])[1]
+        while elapsed() < budget and not stopped:
             order = np.random.default_rng(config['seed'] + epoch).permutation(len(train))
             remaining = [train[i] for i in order[offset:]]
             loader = loader_for(remaining, processor)
@@ -227,35 +297,14 @@ def train_budget(config):
                     optimizer.zero_grad(set_to_none=True)
                 if step == 1 or step % 20 == 0:
                     print(f'{name}: epoch {epoch}, page {offset}/{len(train)}, loss {np.mean(losses[-100:]):.3f}, elapsed {elapsed()/60:.1f}/{budget/60:g} min', flush=True)
-                if boundary and (elapsed() - last_eval >= 300 or step == len(loader) or elapsed() >= budget):
+                if boundary and ((not refine and elapsed() - last_eval >= 300) or step == len(loader) or elapsed() >= budget):
                     metrics = detection_metrics(val, predict_pages(model, processor, val))
-                    history.append(dict(epoch=epoch, pages_in_epoch=offset, images_seen=images_seen, seconds=elapsed(), train_loss=float(np.mean(losses[-100:])), **metrics))
-                    improved = metrics['mAP'] > best
-                    best = max(best, metrics['mAP'])
-                    model.save_pretrained(directory / 'last')
-                    processor.save_pretrained(directory / 'last')
-                    if improved:
-                        model.save_pretrained(directory / 'best')
-                        processor.save_pretrained(directory / 'best')
-                    next_epoch, next_offset = (epoch + 1, 0) if offset == len(train) else (epoch, offset)
-                    state = dict(config=config, epoch=next_epoch, offset=next_offset, seconds=elapsed(), images_seen=images_seen,
-                        best=best, history=history, optimizer=optimizer.state_dict(), rng=torch.get_rng_state(),
-                        scheduler=scheduler.state_dict(), numpy_rng=np.random.get_state(), python_rng=random.getstate(),
-                        device_rng=torch.mps.get_rng_state() if next(model.parameters()).device.type == 'mps' else None, split_sha256=split_hash)
-                    torch.save(state, directory / 'last/state.pt')
-                    metadata = dict(config=config, checkpoint=dict(zip(('id', 'revision'), VARIANTS[name])),
-                        dataset_revision=REVISION, split_sha256=split_hash, device=str(next(model.parameters()).device),
-                        torch_version=torch.__version__, parameters=sum(p.numel() for p in model.parameters()), history=history)
-                    metadata['optimizer'] = dict(name='AdamW', weight_decay=1e-4,
-                        base_learning_rates=[group['base_lr'] for group in optimizer.param_groups],
-                        schedule='cosine over elapsed budget, linear warmup up to 150 seconds', effective_batch=4)
-                    metadata.update(charged_seconds=state['seconds'], status='paused' if state['seconds'] < budget else 'complete')
-                    (directory / 'training.json').write_text(json.dumps(metadata, indent=2))
-                    save_run(name, training=metadata)
-                    print(f'{name}: validation mAP {metrics["mAP"]:.4f}, AP50 {metrics["AP50"]:.4f}; best {best:.4f}; saved at {elapsed()/60:.1f} min', flush=True)
+                    history.append(dict(epoch=epoch, pages_in_epoch=offset, images_seen=images_seen, seconds=elapsed(),
+                        train_loss=float(np.mean(losses[-100:])), epoch_complete=offset == len(train), **metrics))
+                    stopped = checkpoint(metrics)
                     model.train()
                     last_eval = elapsed()
-                if boundary and elapsed() >= budget:
+                if boundary and (elapsed() >= budget or stopped):
                     break
             if offset == len(train):
                 epoch, offset = epoch + 1, 0
@@ -266,8 +315,8 @@ def train_budget(config):
     if device_for(config['device']).type == 'mps':
         torch.mps.empty_cache()
     processor, model = load_variant(name, directory / 'best', config['size'], config['device'])
-    report = summarize(name, model, processor, val, directory)
-    print(f'{name} completed: raw mAP {report["raw"]["mAP"]:.4f}; filtered F1 {report["filtered"]["detection_F1"]:.4f}', flush=True)
+    report = summarize(run_name, model, processor, val, directory)
+    print(f'{run_name} completed: raw mAP {report["raw"]["mAP"]:.4f}; filtered F1 {report["filtered"]["detection_F1"]:.4f}', flush=True)
     return report
 
 
@@ -541,18 +590,34 @@ def write_comparison_report():
     return frame
 
 
+def refinement_table():
+    import pandas as pd
+    benchmark = json.loads((BENCH_DIR / 'runs.json').read_text())['rf-small']
+    refined = json.loads((ROOT / 'results/cv/rf-small-refined.json').read_text())['rf-small-refined']
+    rows = []
+    for name, record in (('50-minute benchmark', benchmark), ('RF-DETR Small refinement', refined)):
+        training, metrics = record['training'], record.get('metrics')
+        raw = metrics['raw'] if metrics else max(training['history'], key=lambda row: row['mAP'])
+        rows.append(dict(run=name, status=training['status'], minutes=training['charged_seconds']/60,
+            mAP=raw['mAP'], AP50=raw['AP50'], handwritten_AP=raw['AP_by_type']['handwritten'] if metrics else None,
+            F1=metrics['filtered']['detection_F1'] if metrics else None,
+            coverage=metrics['handwritten_coverage']['matched_coverage'] if metrics else None))
+    return pd.DataFrame(rows)
+
+
 def evaluate_variant(config):
     name = config['model']
-    directory = ROOT / 'models' / f'benchmark-{name}'
+    run_name = 'rf-small-refined' if config.get('refine') else name
+    directory = ROOT / 'models' / ('rf-small-refined' if config.get('refine') else f'benchmark-{name}')
     val = subset(pages_with_split(), 'val')
     if name == 'yolo26s':
         os.environ.setdefault('YOLO_CONFIG_DIR', str(ROOT / '.cache/ultralytics'))
         from ultralytics import YOLO
         model = YOLO(str(directory / 'weights/common_best.pt'))
         predictions = yolo_predictions(model, val, device_for(config['device']), config['size'])
-        report = summarize(name, None, None, val, directory, predictions)
+        report = summarize(run_name, None, None, val, directory, predictions)
     else:
         processor, model = load_variant(name, directory / 'best', config['size'], config['device'])
-        report = summarize(name, model, processor, val, directory)
-    print(f'{name}: evaluated saved best checkpoint; raw mAP {report["raw"]["mAP"]:.4f}', flush=True)
+        report = summarize(run_name, model, processor, val, directory)
+    print(f'{run_name}: evaluated saved best checkpoint; raw mAP {report["raw"]["mAP"]:.4f}', flush=True)
     return report

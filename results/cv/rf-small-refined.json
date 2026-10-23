@@ -1,0 +1,419 @@
+{
+  "rf-small-refined": {
+    "training": {
+      "dataset_revision": "78697007cfa5f77aae5d3b9fcedfac3169f84fb6",
+      "split_sha256": "51c79caa343c7c20f00345f8b9dd65a772fae615958ed0633353e900e3dfb476",
+      "device": "mps:0",
+      "torch_version": "2.14.1",
+      "parameters": 31808938,
+      "checkpoint": {
+        "id": "Roboflow/rf-detr-small",
+        "revision": "3bdc465063270f99769da5a1b4c00c68bd2d439d"
+      },
+      "charged_seconds": 7196.829938666895,
+      "status": "early_stopped",
+      "optimizer": {
+        "name": "AdamW",
+        "weight_decay": 0.0001,
+        "base_learning_rates": [
+          3.0923764531200015e-06,
+          3.865470566400002e-06,
+          4.8318382080000014e-06,
+          6.039797760000002e-06,
+          7.549747200000003e-06,
+          9.437184000000001e-06,
+          1.1796480000000003e-05,
+          1.4745600000000002e-05,
+          1.8432000000000002e-05,
+          2.3040000000000003e-05,
+          2.8800000000000002e-05,
+          3.5999999999999994e-05,
+          4.4999999999999996e-05,
+          3e-05
+        ],
+        "schedule": "cosine over elapsed budget, linear warmup up to 150 seconds",
+        "effective_batch": 4
+      },
+      "config": {
+        "model": "rf-small",
+        "minutes": 540.0,
+        "size": 640,
+        "seed": 42,
+        "refine": true,
+        "lr_scale": 0.3,
+        "patience": 5,
+        "min_delta": 0.002,
+        "init_from": "models/benchmark-rf-small/best"
+      },
+      "history": [
+        {
+          "epoch": 0,
+          "pages_in_epoch": 0,
+          "images_seen": 0,
+          "seconds": 13.954323208890855,
+          "train_loss": null,
+          "mAP": 0.42505491964498143,
+          "AP50": 0.6474970306174077,
+          "epoch_complete": false
+        },
+        {
+          "epoch": 1,
+          "pages_in_epoch": 1197,
+          "images_seen": 1197,
+          "seconds": 438.62246224982664,
+          "train_loss": 4.521734066009522,
+          "mAP": 0.42515350075647435,
+          "AP50": 0.6384703086498376,
+          "epoch_complete": true
+        },
+        {
+          "epoch": 2,
+          "pages_in_epoch": 1197,
+          "images_seen": 2394,
+          "seconds": 861.5675616250373,
+          "train_loss": 4.649633533954621,
+          "mAP": 0.42715319165215326,
+          "AP50": 0.6556360149948959,
+          "epoch_complete": true
+        },
+        {
+          "epoch": 3,
+          "pages_in_epoch": 1197,
+          "images_seen": 3591,
+          "seconds": 1285.1637829588726,
+          "train_loss": 4.176929957866669,
+          "mAP": 0.4364277298863321,
+          "AP50": 0.6569411226833499,
+          "epoch_complete": true
+        },
+        {
+          "epoch": 4,
+          "pages_in_epoch": 1197,
+          "images_seen": 4788,
+          "seconds": 1708.8325276668184,
+          "train_loss": 4.277234396934509,
+          "mAP": 0.44453664056075654,
+          "AP50": 0.6797559787691198,
+          "epoch_complete": true
+        },
+        {
+          "epoch": 5,
+          "pages_in_epoch": 1197,
+          "images_seen": 5985,
+          "seconds": 2131.963357208995,
+          "train_loss": 4.085694897174835,
+          "mAP": 0.4384215447993926,
+          "AP50": 0.6855225501831264,
+          "epoch_complete": true
+        },
+        {
+          "epoch": 6,
+          "pages_in_epoch": 1197,
+          "images_seen": 7182,
+          "seconds": 2554.2719206248876,
+          "train_loss": 4.022091269493103,
+          "mAP": 0.46438650582563473,
+          "AP50": 0.6739507548342799,
+          "epoch_complete": true
+        },
+        {
+          "epoch": 7,
+          "pages_in_epoch": 1197,
+          "images_seen": 8379,
+          "seconds": 2976.6452904590406,
+          "train_loss": 4.319658615589142,
+          "mAP": 0.4348176860960154,
+          "AP50": 0.6345044360954031,
+          "epoch_complete": true
+        },
+        {
+          "epoch": 8,
+          "pages_in_epoch": 1197,
+          "images_seen": 9576,
+          "seconds": 3398.399077499984,
+          "train_loss": 4.137627575397492,
+          "mAP": 0.4333788056907227,
+          "AP50": 0.667594176259781,
+          "epoch_complete": true
+        },
+        {
+          "epoch": 9,
+          "pages_in_epoch": 1197,
+          "images_seen": 10773,
+          "seconds": 3820.4752322919667,
+          "train_loss": 3.8724287247657774,
+          "mAP": 0.4437937545676634,
+          "AP50": 0.6609903724811574,
+          "epoch_complete": true
+        },
+        {
+          "epoch": 10,
+          "pages_in_epoch": 1197,
+          "images_seen": 11970,
+          "seconds": 4242.9553355840035,
+          "train_loss": 3.943069655895233,
+          "mAP": 0.472875260552088,
+          "AP50": 0.6890629553796379,
+          "epoch_complete": true
+        },
+        {
+          "epoch": 11,
+          "pages_in_epoch": 1197,
+          "images_seen": 13167,
+          "seconds": 4665.219622583827,
+          "train_loss": 3.949957048892975,
+          "mAP": 0.4813697985532127,
+          "AP50": 0.6921331307009867,
+          "epoch_complete": true
+        },
+        {
+          "epoch": 12,
+          "pages_in_epoch": 1197,
+          "images_seen": 14364,
+          "seconds": 5087.103696999839,
+          "train_loss": 3.812183606624603,
+          "mAP": 0.5105132387580957,
+          "AP50": 0.7310073389194857,
+          "epoch_complete": true
+        },
+        {
+          "epoch": 13,
+          "pages_in_epoch": 1197,
+          "images_seen": 15561,
+          "seconds": 5508.849260791903,
+          "train_loss": 3.6132323944568636,
+          "mAP": 0.4675026239275757,
+          "AP50": 0.6828864198329694,
+          "epoch_complete": true
+        },
+        {
+          "epoch": 14,
+          "pages_in_epoch": 1197,
+          "images_seen": 16758,
+          "seconds": 5931.029072166886,
+          "train_loss": 3.7559517776966094,
+          "mAP": 0.46311190060228224,
+          "AP50": 0.6867958321493287,
+          "epoch_complete": true
+        },
+        {
+          "epoch": 15,
+          "pages_in_epoch": 1197,
+          "images_seen": 17955,
+          "seconds": 6352.580556625035,
+          "train_loss": 3.579132857322693,
+          "mAP": 0.47448314399997893,
+          "AP50": 0.7059087878060745,
+          "epoch_complete": true
+        },
+        {
+          "epoch": 16,
+          "pages_in_epoch": 1197,
+          "images_seen": 19152,
+          "seconds": 6774.302839666838,
+          "train_loss": 3.5032702398300173,
+          "mAP": 0.4745250982394056,
+          "AP50": 0.6992998384162895,
+          "epoch_complete": true
+        },
+        {
+          "epoch": 17,
+          "pages_in_epoch": 1197,
+          "images_seen": 20349,
+          "seconds": 7196.585394792026,
+          "train_loss": 3.498778970241547,
+          "mAP": 0.44553524415421303,
+          "AP50": 0.6893669853451112,
+          "epoch_complete": true
+        }
+      ],
+      "preprocessing": "640 square; batch 1, accumulation 4; FP32; augmentation disabled"
+    },
+    "metrics": {
+      "model": "rf-small-refined",
+      "raw": {
+        "pages": 133,
+        "mAP": 0.5105132387580957,
+        "AP50": 0.7310073389194857,
+        "AP_by_type": {
+          "handwritten": 0.5543450536218755,
+          "printed": 0.1395744746888482,
+          "formula": 0.5004444539113969,
+          "table": 0.6075851225338603,
+          "annotation": 0.3100484845072733,
+          "image": 0.6724861711523266,
+          "graph": 0.7891089108910891
+        },
+        "score_threshold": 0.25,
+        "detection_precision": 0.8211353088182792,
+        "detection_recall": 0.9338205440519691,
+        "detection_F1": 0.8738601823708206,
+        "matched_regions": 2300,
+        "gt_regions": 2463,
+        "matched_coverage": 0.9338205440519691,
+        "type_accuracy": 0.9639130434782609,
+        "type_macro_F1": 0.8967906843801069
+      },
+      "filtered": {
+        "pages": 133,
+        "mAP": 0.5093982092515852,
+        "AP50": 0.7331520240471661,
+        "AP_by_type": {
+          "handwritten": 0.5429248192024353,
+          "printed": 0.13960896089608962,
+          "formula": 0.5014360554680817,
+          "table": 0.6062031482838474,
+          "annotation": 0.3017035898215332,
+          "image": 0.6724257425742575,
+          "graph": 0.8014851485148515
+        },
+        "score_threshold": 0.55,
+        "detection_precision": 0.9353319057815845,
+        "detection_recall": 0.8867235079171741,
+        "detection_F1": 0.9103793247186328,
+        "matched_regions": 2184,
+        "gt_regions": 2463,
+        "matched_coverage": 0.8867235079171741,
+        "type_accuracy": 0.9693223443223443,
+        "type_macro_F1": 0.785698337763016
+      },
+      "per_source": {
+        "archive": {
+          "pages": 13,
+          "mAP": 0.48657819884479214,
+          "AP50": 0.84486555659478,
+          "AP_by_type": {
+            "handwritten": 0.5458587393523219,
+            "printed": null,
+            "formula": null,
+            "table": null,
+            "annotation": 0.4272976583372623,
+            "image": null,
+            "graph": null
+          },
+          "score_threshold": 0.55,
+          "detection_precision": 0.9773462783171522,
+          "detection_recall": 0.937888198757764,
+          "detection_F1": 0.9572107765451664,
+          "matched_regions": 302,
+          "gt_regions": 322,
+          "matched_coverage": 0.937888198757764,
+          "type_accuracy": 0.9966887417218543,
+          "type_macro_F1": 0.27706755615363693
+        },
+        "dictation": {
+          "pages": 36,
+          "mAP": 0.26010033944636235,
+          "AP50": 0.5371656469030298,
+          "AP_by_type": {
+            "handwritten": 0.5456475529925524,
+            "printed": null,
+            "formula": null,
+            "table": null,
+            "annotation": 0.23465346534653464,
+            "image": 0.0,
+            "graph": null
+          },
+          "score_threshold": 0.55,
+          "detection_precision": 0.9688715953307393,
+          "detection_recall": 0.92336217552534,
+          "detection_F1": 0.9455696202531645,
+          "matched_regions": 747,
+          "gt_regions": 809,
+          "matched_coverage": 0.92336217552534,
+          "type_accuracy": 1.0,
+          "type_macro_F1": 0.2857142857142857
+        },
+        "school": {
+          "pages": 68,
+          "mAP": 0.5072999207316877,
+          "AP50": 0.6928541602044848,
+          "AP_by_type": {
+            "handwritten": 0.5586581589429813,
+            "printed": 0.18678130970991838,
+            "formula": 0.5179604016242121,
+            "table": 0.6068513900262207,
+            "annotation": 0.012118811881188117,
+            "image": 0.7434818481848184,
+            "graph": 0.9252475247524753
+          },
+          "score_threshold": 0.55,
+          "detection_precision": 0.8979591836734694,
+          "detection_recall": 0.8646288209606987,
+          "detection_F1": 0.8809788654060066,
+          "matched_regions": 792,
+          "gt_regions": 916,
+          "matched_coverage": 0.8646288209606987,
+          "type_accuracy": 0.9381313131313131,
+          "type_macro_F1": 0.6378449500423199
+        },
+        "university": {
+          "pages": 16,
+          "mAP": 0.598700829091077,
+          "AP50": 0.8456671493586616,
+          "AP_by_type": {
+            "handwritten": 0.5258859368893825,
+            "printed": null,
+            "formula": 0.48809370906385774,
+            "table": null,
+            "annotation": 0.32803935098729387,
+            "image": 0.8999999999999999,
+            "graph": 0.7514851485148513
+          },
+          "score_threshold": 0.55,
+          "detection_precision": 0.9195710455764075,
+          "detection_recall": 0.8245192307692307,
+          "detection_F1": 0.8694550063371355,
+          "matched_regions": 343,
+          "gt_regions": 416,
+          "matched_coverage": 0.8245192307692307,
+          "type_accuracy": 0.9504373177842566,
+          "type_macro_F1": 0.6877631523903034
+        }
+      },
+      "nms_iou": 0.5,
+      "threshold_selection": "validation geometry F1",
+      "threshold_search": [
+        {
+          "score_threshold": 0.1,
+          "detection_precision": 0.7356870229007634,
+          "detection_recall": 0.9390986601705238,
+          "detection_F1": 0.825040128410915
+        },
+        {
+          "score_threshold": 0.25,
+          "detection_precision": 0.8664891593761886,
+          "detection_recall": 0.9248883475436459,
+          "detection_F1": 0.8947368421052632
+        },
+        {
+          "score_threshold": 0.4,
+          "detection_precision": 0.9073999191265669,
+          "detection_recall": 0.9110840438489647,
+          "detection_F1": 0.9092382495948136
+        },
+        {
+          "score_threshold": 0.55,
+          "detection_precision": 0.9353319057815845,
+          "detection_recall": 0.8867235079171741,
+          "detection_F1": 0.9103793247186328
+        },
+        {
+          "score_threshold": 0.7,
+          "detection_precision": 0.9534667287110283,
+          "detection_recall": 0.8319123020706456,
+          "detection_F1": 0.888551604509974
+        }
+      ],
+      "handwritten_coverage": {
+        "eligible_gt_lines": 2076,
+        "matched_lines": 1862,
+        "predicted_lines": 2063,
+        "missed_lines": 214,
+        "unmatched_predictions": 201,
+        "matched_coverage": 0.896917148362235,
+        "score_threshold": 0.55
+      }
+    }
+  }
+}
