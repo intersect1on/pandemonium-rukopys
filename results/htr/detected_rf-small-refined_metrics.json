@@ -1,0 +1,98 @@
+{
+  "detector": "rf-small-refined",
+  "model": "../models/trocr-uk-baseline",
+  "decoding": {
+    "num_beams": 4,
+    "no_repeat_ngram_size": 0,
+    "max_length": 130
+  },
+  "coverage": {
+    "eligible_gt_lines": 2076,
+    "matched_lines": 1862,
+    "predicted_lines": 2063,
+    "missed_lines": 214,
+    "unmatched_predictions": 201,
+    "matched_coverage": 0.896917148362235,
+    "score_threshold": 0.55,
+    "note": "CER/WER on matched rows is conditional on successful detection."
+  },
+  "results": [
+    {
+      "source": "all eligible",
+      "crops": "annotated",
+      "lines": 2076,
+      "CER": 0.1145,
+      "WER": 0.315
+    },
+    {
+      "source": "all matched",
+      "crops": "annotated",
+      "lines": 1862,
+      "CER": 0.1102,
+      "WER": 0.3071
+    },
+    {
+      "source": "all matched",
+      "crops": "detected",
+      "lines": 1862,
+      "CER": 0.1119,
+      "WER": 0.3056
+    },
+    {
+      "source": "archive",
+      "crops": "annotated",
+      "lines": 289,
+      "CER": 0.1176,
+      "WER": 0.3581
+    },
+    {
+      "source": "archive",
+      "crops": "detected",
+      "lines": 289,
+      "CER": 0.1159,
+      "WER": 0.3554
+    },
+    {
+      "source": "dictation",
+      "crops": "annotated",
+      "lines": 742,
+      "CER": 0.071,
+      "WER": 0.1665
+    },
+    {
+      "source": "dictation",
+      "crops": "detected",
+      "lines": 742,
+      "CER": 0.072,
+      "WER": 0.1677
+    },
+    {
+      "source": "school",
+      "crops": "annotated",
+      "lines": 583,
+      "CER": 0.1129,
+      "WER": 0.3641
+    },
+    {
+      "source": "school",
+      "crops": "detected",
+      "lines": 583,
+      "CER": 0.1145,
+      "WER": 0.357
+    },
+    {
+      "source": "university",
+      "crops": "annotated",
+      "lines": 248,
+      "CER": 0.1958,
+      "WER": 0.5503
+    },
+    {
+      "source": "university",
+      "crops": "detected",
+      "lines": 248,
+      "CER": 0.2025,
+      "WER": 0.551
+    }
+  ]
+}
