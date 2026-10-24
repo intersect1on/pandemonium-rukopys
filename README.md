@@ -47,7 +47,9 @@ CV notebooks cover [model selection](notebooks/04_detector_comparison.ipynb), [d
 
 The benchmark budget is cumulative per candidate. `--resume-existing` resumes saved progress, `--models rf-small` selects one candidate, and `--evaluate-only` evaluates saved checkpoints. Run settings and scores are recorded in `results/cv/benchmark/runs.json`.
 
-[08_htr_detected_eval](notebooks/08_htr_detected_eval.ipynb) runs the same TrOCR checkpoint on the refined RF-DETR crops (`data/detector_crops/rf-small-refined/`) and compares it with annotated crops on the same matched lines. On the 1,862 matched validation lines CER is 0.1119 versus 0.1102 for annotated crops (WER 0.3056 versus 0.3071); 214 of 2,076 eligible lines are missed. Results are in `results/htr/detected_*`.
+[08_htr_detected_eval](notebooks/08_htr_detected_eval.ipynb) runs the same TrOCR checkpoint on the refined RF-DETR crops (`data/detector_crops/rf-small-refined/`) and compares it with annotated crops on the same matched lines. On the 1,862 matched validation lines CER is 0.1119 versus 0.1102 for annotated crops (WER 0.3056 versus 0.3071); 214 of 2,076 eligible lines are missed. Results are in `results/htr/detected_*`, with page-bootstrap 95% intervals per source.
+
+[09_htr_page_pipeline](notebooks/09_htr_page_pipeline.ipynb) runs the full chain on the 133 validation pages (RF-DETR Small at score 0.55, TrOCR on handwritten boxes, lines joined top to bottom; helpers in `src/pipeline.py`). Page CER, where missed lines are deletions and extra predictions are insertions, is 0.1849 (95% interval 0.1515–0.2207) against 0.1119 on matched lines. It is not comparable to matched-line CER or to Kaggle scores. Results are in `results/htr/page_*`.
 
 Weights, data and predicted crops stay outside Git.
 

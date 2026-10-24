@@ -22,6 +22,8 @@
       "crops": "annotated",
       "lines": 2076,
       "CER": 0.1145,
+      "CER_95_low": 0.0833,
+      "CER_95_high": 0.1571,
       "WER": 0.315
     },
     {
@@ -29,6 +31,8 @@
       "crops": "annotated",
       "lines": 1862,
       "CER": 0.1102,
+      "CER_95_low": 0.0787,
+      "CER_95_high": 0.1513,
       "WER": 0.3071
     },
     {
@@ -36,6 +40,8 @@
       "crops": "detected",
       "lines": 1862,
       "CER": 0.1119,
+      "CER_95_low": 0.0818,
+      "CER_95_high": 0.1537,
       "WER": 0.3056
     },
     {
@@ -43,6 +49,8 @@
       "crops": "annotated",
       "lines": 289,
       "CER": 0.1176,
+      "CER_95_low": 0.0908,
+      "CER_95_high": 0.1434,
       "WER": 0.3581
     },
     {
@@ -50,6 +58,8 @@
       "crops": "detected",
       "lines": 289,
       "CER": 0.1159,
+      "CER_95_low": 0.0876,
+      "CER_95_high": 0.1424,
       "WER": 0.3554
     },
     {
@@ -57,6 +67,8 @@
       "crops": "annotated",
       "lines": 742,
       "CER": 0.071,
+      "CER_95_low": 0.0289,
+      "CER_95_high": 0.1525,
       "WER": 0.1665
     },
     {
@@ -64,6 +76,8 @@
       "crops": "detected",
       "lines": 742,
       "CER": 0.072,
+      "CER_95_low": 0.0291,
+      "CER_95_high": 0.1544,
       "WER": 0.1677
     },
     {
@@ -71,6 +85,8 @@
       "crops": "annotated",
       "lines": 583,
       "CER": 0.1129,
+      "CER_95_low": 0.086,
+      "CER_95_high": 0.1432,
       "WER": 0.3641
     },
     {
@@ -78,6 +94,8 @@
       "crops": "detected",
       "lines": 583,
       "CER": 0.1145,
+      "CER_95_low": 0.0819,
+      "CER_95_high": 0.1469,
       "WER": 0.357
     },
     {
@@ -85,6 +103,8 @@
       "crops": "annotated",
       "lines": 248,
       "CER": 0.1958,
+      "CER_95_low": 0.1412,
+      "CER_95_high": 0.2541,
       "WER": 0.5503
     },
     {
@@ -92,6 +112,8 @@
       "crops": "detected",
       "lines": 248,
       "CER": 0.2025,
+      "CER_95_low": 0.1471,
+      "CER_95_high": 0.2619,
       "WER": 0.551
     }
   ]

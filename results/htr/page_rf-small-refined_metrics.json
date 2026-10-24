@@ -1,0 +1,47 @@
+{
+  "detector": "models/rf-small-refined/best",
+  "model": "models/trocr-uk-baseline",
+  "decoding": {
+    "num_beams": 4,
+    "no_repeat_ngram_size": 0,
+    "max_length": 130
+  },
+  "score_threshold": 0.55,
+  "results": [
+    {
+      "source": "archive",
+      "pages": 13.0,
+      "CER": 0.163,
+      "CER_95_low": 0.1255,
+      "CER_95_high": 0.1968
+    },
+    {
+      "source": "dictation",
+      "pages": 36.0,
+      "CER": 0.1379,
+      "CER_95_low": 0.0751,
+      "CER_95_high": 0.2215
+    },
+    {
+      "source": "school",
+      "pages": 68.0,
+      "CER": 0.2269,
+      "CER_95_low": 0.1826,
+      "CER_95_high": 0.2831
+    },
+    {
+      "source": "university",
+      "pages": 16.0,
+      "CER": 0.2709,
+      "CER_95_low": 0.211,
+      "CER_95_high": 0.3419
+    },
+    {
+      "source": "all",
+      "pages": 133.0,
+      "CER": 0.1849,
+      "CER_95_low": 0.1515,
+      "CER_95_high": 0.2207
+    }
+  ]
+}

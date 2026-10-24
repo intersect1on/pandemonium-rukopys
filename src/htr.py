@@ -5,6 +5,7 @@ import unicodedata
 from pathlib import Path
 
 import jiwer
+import numpy as np
 import torch
 from huggingface_hub import snapshot_download
 from PIL import Image
@@ -63,6 +64,14 @@ def cer(refs, hyps):
 
 def wer(refs, hyps):
     return jiwer.wer(list(refs), list(hyps))
+
+
+def cer_interval(group, errors='char_errors', chars='chars', n=1000, seed=42):
+    """Page-bootstrap 95% interval of CER: resample pages, sum their errors and reference characters."""
+    pages = group.groupby('page_id')[[errors, chars]].sum().to_numpy()
+    idx = np.random.default_rng(seed).integers(0, len(pages), (n, len(pages)))
+    sample = pages[idx].sum(axis=1)
+    return np.percentile(sample[:, 0] / sample[:, 1], [2.5, 97.5])
 
 
 class LineDataset(torch.utils.data.Dataset):
