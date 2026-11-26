@@ -24,6 +24,7 @@ dist/
 /data/*
 !/data/README.md
 !/data/eda.md
+!/data/silver.md
 !/data/images/
 /data/images/*
 !/data/images/examples.png

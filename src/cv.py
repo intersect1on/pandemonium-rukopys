@@ -112,8 +112,9 @@ def subset(pages, role, limit=None, seed=42):
 
 
 class PageDataset(torch.utils.data.Dataset):
-    def __init__(self, pages, processor):
+    def __init__(self, pages, processor, image_root=None):
         self.pages, self.processor = pages, processor
+        self.image_root = Path(image_root) if image_root is not None else snapshot() / 'train'
 
     def __len__(self):
         return len(self.pages)
@@ -122,7 +123,7 @@ class PageDataset(torch.utils.data.Dataset):
         page = self.pages[index]
         size = self.processor.size
         longest = size.get('longest_edge') or max(size.get('height', 0), size.get('width', 0))
-        with Image.open(snapshot() / 'train' / page['file_name']) as original:
+        with Image.open(self.image_root / page['file_name']) as original:
             original.thumbnail((longest,) * 2)
             image = original.convert('RGB')
         sx, sy = image.width / page['image_width'], image.height / page['image_height']
@@ -150,8 +151,8 @@ def collate_pages(batch):
     return dict(pixel_values=torch.stack(values), pixel_mask=torch.stack(masks), labels=targets, pages=list(pages))
 
 
-def loader_for(pages, processor, batch_size=1, shuffle=False):
-    return torch.utils.data.DataLoader(PageDataset(pages, processor), batch_size=batch_size, shuffle=shuffle,
+def loader_for(pages, processor, batch_size=1, shuffle=False, *, image_root=None):
+    return torch.utils.data.DataLoader(PageDataset(pages, processor, image_root), batch_size=batch_size, shuffle=shuffle,
                                       num_workers=0, collate_fn=collate_pages)
 
 
@@ -171,11 +172,11 @@ def load_detector(checkpoint=None):
 
 
 @torch.no_grad()
-def predict_pages(model, processor, pages, batch_size=1):
+def predict_pages(model, processor, pages, batch_size=1, *, image_root=None):
     device = next(model.parameters()).device
     model.eval()
     predictions = []
-    for index, batch in enumerate(loader_for(pages, processor, batch_size), 1):
+    for index, batch in enumerate(loader_for(pages, processor, batch_size, image_root=image_root), 1):
         output = model(pixel_values=batch['pixel_values'].to(device), pixel_mask=batch['pixel_mask'].to(device))
         padded_height, padded_width = batch['pixel_values'].shape[-2:]
         sizes = torch.tensor([(p['image_height'] * padded_height / mask[:, 0].sum().item(),
@@ -372,8 +373,9 @@ def train_detector(config):
     return history
 
 
-def export_predicted_crops(pages, predictions, score_threshold=0.25, output_dir=None):
-    output_dir = Path(output_dir or ROOT / 'data/detector_crops')
+def export_predicted_crops(pages, predictions, score_threshold, output_dir, *, image_root=None):
+    output_dir = Path(output_dir)
+    image_root = Path(image_root) if image_root is not None else snapshot() / 'train'
     output_dir.mkdir(parents=True, exist_ok=True)
     by_name = {p['file_name']: p for p in predictions}
     records, eligible_count, matched_count = [], 0, 0
@@ -386,7 +388,7 @@ def export_predicted_crops(pages, predictions, score_threshold=0.25, output_dir=
         eligible_count += len(truth)
         matched_count += len(matches)
         page_id = Path(page['file_name']).stem
-        with Image.open(snapshot() / 'train' / page['file_name']) as source:
+        with Image.open(image_root / page['file_name']) as source:
             for region, pi in enumerate(selected):
                 box = prediction['boxes'][pi]
                 bounds = (math.floor(box[0]), math.floor(box[1]), math.ceil(box[2]), math.ceil(box[3]))

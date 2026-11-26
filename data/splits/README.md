@@ -5,6 +5,7 @@
 - About 10% of pages per source go to validation (133 of 1,330), sampled with seed 42.
 - All regions of a page stay in that page's split. The metadata has no writer or document IDs, and train has no exact duplicate images, so no further grouping is possible.
 - Train dictation pages all copy the same 2024 dictation text, so validation dictation is partly memorisable. Report results per source.
-- The official `test` split is not part of this file and is not used for model or threshold selection.
+- This manifest uses the v2.2 human annotations. Use v3.0 for official test after model selection and for silver. [Dataset setup](../README.md)
+- `silver_pool.csv` lists the v3.0 page IDs selected for the shared training pool. [Pool record](../silver.md)
 
 The file is written by `notebooks/01_htr_pilot.ipynb`. The CV baseline reuses this exact file; `results/cv/baseline.json` records its SHA-256. It remains provisional with the grouping limitations above.

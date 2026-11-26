@@ -1,6 +1,7 @@
 """Page -> detector -> line crops -> TrOCR -> text in reading order."""
 import gc
 import math
+from pathlib import Path
 
 import jiwer
 import torch
@@ -14,10 +15,10 @@ THRESHOLD = 0.55
 NMS_IOU = 0.5
 
 
-def detect(pages, checkpoint, threshold=THRESHOLD, device='gpu'):
+def detect(pages, checkpoint, threshold=THRESHOLD, device='gpu', *, image_root=None):
     """Detected regions per page (score >= threshold), top to bottom. Returns {file_name: [region, ...]}."""
     processor, model = load_variant('rf-small', checkpoint=checkpoint, device=device)
-    raw = predict_pages(model, processor, pages)
+    raw = predict_pages(model, processor, pages, image_root=image_root)
     del model
     gc.collect()
     torch.cuda.empty_cache()
@@ -42,11 +43,12 @@ def recognize(model, processor, images, batch_size=16, **decoding):
     return [' '.join(t.split()) for t in out]
 
 
-def transcribe(page, regions, model, processor, **decoding):
+def transcribe(page, regions, model, processor, *, image_root=None, **decoding):
     """Adds `text` to every handwritten region (None for other types). Crops come from the raw image."""
     handwritten = [r for r in regions if r['type'] == 'handwritten']
     crops = []
-    with Image.open(snapshot() / 'train' / page['file_name']) as source:
+    image_root = Path(image_root) if image_root is not None else snapshot() / 'train'
+    with Image.open(image_root / page['file_name']) as source:
         for r in handwritten:
             x1, y1, x2, y2 = r['box']
             crop = source.crop((math.floor(x1), math.floor(y1), math.ceil(x2), math.ceil(y2))).convert('RGB')

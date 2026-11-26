@@ -11,6 +11,8 @@ from huggingface_hub import snapshot_download
 from PIL import Image
 
 REVISION = '78697007cfa5f77aae5d3b9fcedfac3169f84fb6'
+SILVER_TEST_REVISION = '50b4cdc0e861ae2adf481def238068563f405ff8'
+DATASET_ID = 'UkrainianCatholicUniversity/rukopys'
 ROOT = Path(__file__).resolve().parents[1]
 SPLIT_FILE = ROOT / 'data/splits/train_val.csv'
 CROP_DIR = ROOT / 'data/htr_crops'
@@ -20,16 +22,20 @@ SOURCES = ('dictation', 'archive', 'university', 'school')
 Image.MAX_IMAGE_PIXELS = None
 
 
-def snapshot():
-    local = ROOT / 'data/rukopys/snapshots' / REVISION
+def snapshot(revision=REVISION):
+    local = ROOT / 'data/rukopys/snapshots' / revision
     if local.is_dir():
         return local
-    return Path(snapshot_download('UkrainianCatholicUniversity/rukopys', repo_type='dataset',
-                                  revision=REVISION, local_files_only=True))
+    return Path(snapshot_download(DATASET_ID, repo_type='dataset', revision=revision, local_files_only=True))
+
+
+def split_root(split):
+    revision = SILVER_TEST_REVISION if split in ('silver', 'test') else REVISION
+    return snapshot(revision) / split
 
 
 def load_pages(split):
-    with open(snapshot() / split / 'metadata.jsonl', encoding='utf-8') as f:
+    with (split_root(split) / 'metadata.jsonl').open(encoding='utf-8') as f:
         return [json.loads(line) for line in f]
 
 

@@ -12,9 +12,9 @@ Turn a page image into content regions, region types, and Ukrainian handwritten 
 
 `page -> DETR detector/type classifier -> handwritten line crops -> TrOCR -> ordered text`
 
-Recognition baseline A uses human-annotated handwritten line crops. Planned experiments add existing silver labels (B) and filtered pseudo-labels (C), using the same detector across recognition comparisons. Detection covers all seven region types; the current recognizer transcribes handwritten text.
+Recognition baseline A uses human-annotated handwritten line crops. B and C each fine-tune from A on v3.0 silver, using supplied transcripts for B and filtered teacher transcripts for C. The detector stays fixed for the recognition comparison. Detection covers seven region types and the recognizer transcribes handwriting. [Silver pool record](data/silver.md)
 
-The shared split contains 1,197 training pages and 133 validation pages, stratified by source with seed 42. The official test set is reserved for final evaluation.
+The v2.2 human split contains 1,197 training pages and 133 validation pages, stratified by source with seed 42. The corrected 382-page v3.0 test set is reserved for final evaluation.
 
 ## Data and evaluation
 
@@ -24,7 +24,7 @@ Planned metrics: CER/WER, detection mAP, type macro-F1 with coverage, handwritte
 
 ## Setup and results
 
-The data audit can be reproduced with `uv run python scripts/eda.py PATH_TO_SNAPSHOT` after running `uv sync`. See [data/README.md](data/README.md) for setup, download instructions, and the pinned revision.
+Run `uv sync` and `uv run python scripts/sync_rukopys.py` from the repository root. [Dataset setup and pinned revisions](data/README.md)
 
 The recognition notebooks need the pinned snapshot (local `data/rukopys/` or Hugging Face cache) and an NVIDIA GPU with about 7 GB free. Run them in order from the repository root:
 
