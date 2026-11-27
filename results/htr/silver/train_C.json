@@ -1,0 +1,117 @@
+{
+  "run": "C",
+  "config": {
+    "init": "models/trocr-uk-baseline",
+    "silver_revision": "50b4cdc0e861ae2adf481def238068563f405ff8",
+    "seed": 42,
+    "steps": 2800,
+    "eval_every": 400,
+    "batch_size": 16,
+    "lr": 3e-05,
+    "weight_decay": 0.01,
+    "warmup_fraction": 0.1,
+    "max_target_tokens": 128,
+    "selection": "lowest greedy validation CER among evaluations at steps 400, 800, ..., 2800"
+  },
+  "filter": {
+    "min_chars": 4,
+    "max_chars": 140,
+    "needs_cyrillic": true,
+    "max_word_repeat": 2,
+    "target_val_cer": 0.05
+  },
+  "training_lines": 8572,
+  "distinct_lines_by_source": {
+    "archive": {
+      "lines": 4198,
+      "pages": 344
+    },
+    "school": {
+      "lines": 2362,
+      "pages": 332
+    },
+    "university": {
+      "lines": 2012,
+      "pages": 326
+    }
+  },
+  "over_long_dropped": 0,
+  "optimizer_steps": 2800,
+  "selected_step": 2800,
+  "selected": {
+    "step": 2800,
+    "epochs_seen": 5.226318245450304,
+    "train_loss": 0.0056500148525810805,
+    "val_CER": 0.126380984265149,
+    "val_WER": 0.3474426807760141,
+    "minutes": 34.08803985913595
+  },
+  "checkpoint": "models/trocr-uk-silver-C",
+  "history": [
+    {
+      "step": 0,
+      "epochs_seen": 0.0,
+      "train_loss": null,
+      "val_CER": 0.12131357092856926,
+      "val_WER": 0.32516476376125497,
+      "minutes": 0.9249614159266154
+    },
+    {
+      "step": 400,
+      "epochs_seen": 0.7466168922071862,
+      "train_loss": 0.10109265075996518,
+      "val_CER": 0.1407310466567246,
+      "val_WER": 0.37389770723104054,
+      "minutes": 5.66061352888743
+    },
+    {
+      "step": 800,
+      "epochs_seen": 1.4932337844143724,
+      "train_loss": 0.12023922340013087,
+      "val_CER": 0.14523541406701768,
+      "val_WER": 0.3819734521488907,
+      "minutes": 10.433210086822509
+    },
+    {
+      "step": 1200,
+      "epochs_seen": 2.2398506766215585,
+      "train_loss": 0.08388029283378273,
+      "val_CER": 0.14150713698755213,
+      "val_WER": 0.375290077044463,
+      "minutes": 15.123672433694203
+    },
+    {
+      "step": 1600,
+      "epochs_seen": 2.9864675688287448,
+      "train_loss": 0.05221148255746812,
+      "val_CER": 0.13761146787594727,
+      "val_WER": 0.36916364986540423,
+      "minutes": 19.822194027900697
+    },
+    {
+      "step": 2000,
+      "epochs_seen": 3.733084461035931,
+      "train_loss": 0.024181662219343706,
+      "val_CER": 0.13371579876434245,
+      "val_WER": 0.3644295924997679,
+      "minutes": 24.59479792912801
+    },
+    {
+      "step": 2400,
+      "epochs_seen": 4.479701353243117,
+      "train_loss": 0.012761408399383072,
+      "val_CER": 0.12870925525763155,
+      "val_WER": 0.3529193353754757,
+      "minutes": 29.350880634784698
+    },
+    {
+      "step": 2800,
+      "epochs_seen": 5.226318245450304,
+      "train_loss": 0.0056500148525810805,
+      "val_CER": 0.126380984265149,
+      "val_WER": 0.3474426807760141,
+      "minutes": 34.08803985913595
+    }
+  ],
+  "minutes": 34.13013068040212
+}

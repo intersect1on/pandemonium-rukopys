@@ -6,6 +6,8 @@ Ukrainian handwritten text recognition on [RUKOPYS](https://huggingface.co/datas
 
 Midterm stage. The downloaded snapshot has been audited; see [data/eda.md](data/eda.md). Recognition has a supervised TrOCR baseline on ground-truth line crops. The 10-epoch detector baseline is trained; validation exposed duplicate boxes and weak localization. Six modern detector benchmarks are complete. RF-DETR Small refinement reached validation mAP 0.5105; early stopping retained epoch 12 after 17 epochs.
 
+Final stage, silver fine-tuning (27 Nov): B and C are trained and scored on human validation. Silver-only training helps the sources it covers but forgets dictation. An exploratory run with human replay (M) lowers validation line CER from 0.1150 to 0.1046. The test comparison is still to come. [Silver results](results/htr/silver-finetune.md)
+
 ## Problem and approach
 
 Turn a page image into content regions, region types, and Ukrainian handwritten text:
@@ -50,6 +52,8 @@ The benchmark budget is cumulative per candidate. `--resume-existing` resumes sa
 [08_htr_detected_eval](notebooks/08_htr_detected_eval.ipynb) runs the same TrOCR checkpoint on the refined RF-DETR crops (`data/detector_crops/rf-small-refined/`) and compares it with annotated crops on the same matched lines. On the 1,862 matched validation lines CER is 0.1119 versus 0.1102 for annotated crops (WER 0.3056 versus 0.3071); 214 of 2,076 eligible lines are missed. Results are in `results/htr/detected_*`, with page-bootstrap 95% intervals per source.
 
 [09_htr_page_pipeline](notebooks/09_htr_page_pipeline.ipynb) runs the full chain on the 133 validation pages (RF-DETR Small at score 0.55, TrOCR on handwritten boxes, lines joined top to bottom; helpers in `src/pipeline.py`). Page CER, where missed lines are deletions and extra predictions are insertions, is 0.1849 (95% interval 0.1515–0.2207) against 0.1119 on matched lines. It is not comparable to matched-line CER or to Kaggle scores. Results are in `results/htr/page_*`.
+
+**Silver fine-tuning** (`scripts/silver_htr.py`, run end to end by `scripts/run_silver_htr.sh`, about 5 hours) continues A for 2,800 steps with a fresh optimizer on the reviewed 1,050-page silver pool (`data/silver_pool/`). B uses the supplied transcripts. C uses A's own transcripts filtered by confidence. H is a step-matched human-only control and M mixes silver with human replay. On the 2,076 human validation lines (beam 4), line CER is A 0.1150, B 0.1217, C 0.1241, H 0.1131 and M **0.1046**. M's gain over A is −0.0104 (paired page-bootstrap 95% interval −0.0145 to −0.0065). B gains on archive, school and university but loses on dictation, which silver lacks. C is worse than A everywhere. With the midterm detector, validation page CER is A 0.1849, B 0.1807, C 0.1910 and M **0.1763**. `scripts/silver_report.py` writes the full tables to `results/htr/silver/README.md`. The [silver results](results/htr/silver-finetune.md) give findings and caveats, including that M was designed after B and C were scored.
 
 Weights, data and predicted crops stay outside Git.
 

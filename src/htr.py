@@ -8,6 +8,7 @@ import jiwer
 import numpy as np
 import torch
 from huggingface_hub import snapshot_download
+from huggingface_hub.constants import HF_HUB_CACHE
 from PIL import Image
 
 REVISION = '78697007cfa5f77aae5d3b9fcedfac3169f84fb6'
@@ -23,9 +24,13 @@ Image.MAX_IMAGE_PIXELS = None
 
 
 def snapshot(revision=REVISION):
-    local = ROOT / 'data/rukopys/snapshots' / revision
-    if local.is_dir():
-        return local
+    # The sync script fetches only the needed splits per revision, so a v3.0 snapshot is partial on purpose and
+    # `snapshot_download(local_files_only=True)` rejects it. Use the snapshot folder directly when it exists.
+    hub = Path(HF_HUB_CACHE) / ('datasets--' + DATASET_ID.replace('/', '--'))
+    for cache in (ROOT / 'data/rukopys', hub):
+        local = cache / 'snapshots' / revision
+        if local.is_dir():
+            return local
     return Path(snapshot_download(DATASET_ID, repo_type='dataset', revision=revision, local_files_only=True))
 
 

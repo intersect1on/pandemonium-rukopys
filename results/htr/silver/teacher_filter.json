@@ -1,0 +1,37 @@
+{
+  "filter": {
+    "min_chars": 4,
+    "max_chars": 140,
+    "needs_cyrillic": true,
+    "max_word_repeat": 2,
+    "target_val_cer": 0.05
+  },
+  "tau": -0.06102403253316879,
+  "calibration": {
+    "val_lines_accepted": 1502,
+    "val_lines": 1998,
+    "val_accepted_CER": 0.04995437472147359
+  },
+  "silver_lines": 14918,
+  "shape_rejected": 59,
+  "accepted": 8572,
+  "accepted_by_source": {
+    "archive": 4198,
+    "school": 2362,
+    "university": 2012
+  },
+  "lines_by_source": {
+    "archive": 7183,
+    "school": 3876,
+    "university": 3859
+  },
+  "teacher_vs_supplied_CER_all": 0.15761732747599544,
+  "teacher_vs_supplied_CER_accepted": 0.08207560179581079,
+  "teacher_vs_supplied_CER_rejected": 0.24599891541588423,
+  "teacher_vs_supplied_CER_by_source": {
+    "archive": 0.14161185151289823,
+    "school": 0.14670848348270382,
+    "university": 0.1993855508950104
+  },
+  "teacher_val_CER": 0.11467875947286728
+}
